@@ -20,14 +20,14 @@ endif()
 
 option(NANOGUI_BUILD_EXAMPLE "Build NanoGUI example application?" ON)
 option(NANOGUI_BUILD_SHARED  "Build NanoGUI as a shared library?" ON)
-option(NANOGUI_BUILD_PYTHON  "Build a Python plugin for NanoGUI?" OFF)
+option(NANOGUI_BUILD_PYTHON  "Build a Python plugin for NanoGUI?" ON)
 option(NANOGUI_USE_GLAD      "Use Glad OpenGL loader library?" ${NANOGUI_USE_GLAD_DEFAULT})
 option(NANOGUI_INSTALL       "Install NanoGUI on `make install`?" ON)
-option(NANOGUI_EXTERNAL_GLFW "Use a external build of GLFW " ON)
+option(NANOGUI_EXTERNAL_GLFW "Use a external build of GLFW " OFF)
 
 if(NANOGUI_EXTERNAL_GLFW)
   set(GLFW_INCLUDE_DIR "" CACHE PATH "GLFW include directory")
-  set(GLFW_LIBRARY "" CACHE STRING "GLFW Library")
+  set(GLFW_LIBRARY "" CACHE FILEPATH "GLFW Library")
 endif()
 set(NANOGUI_PYTHON_VERSION "" CACHE STRING "Python version to use for compiling the Python plugin")
 
@@ -445,7 +445,9 @@ endif()
 if (NANOGUI_BUILD_PYTHON)
   # Need PIC code in libnanogui even when compiled as a static library
   set_target_properties(nanogui-obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
-  set_target_properties(glfw_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  if(NOT NANOGUI_EXTERNAL_GLFW)
+    set_target_properties(glfw_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  endif()
 
   include_directories("ext/pybind11/include" ${PYTHON_INCLUDE_DIR})
   add_library(nanogui-python-obj OBJECT
